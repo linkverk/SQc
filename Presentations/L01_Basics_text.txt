@@ -1,0 +1,616 @@
+=== Slide 1 ===
+Software Quality
+Lesson 1:
+Basics
+
+=== Slide 2 ===
+Introduction
+Designing a secure system/application and assure its quality has become a
+major issue in many areas
+§
+Financial systems, commercial systems, etc.
+Information systems consist of different components
+§
+Hardware, Software, Data, Procedures, People, and Networking(optional)
+Security is treated in many cases as an add-on (1)
+§
+Cryptography, security protocols, etc
+§
+“128-bit keys” sounds effective -> context information needed
+1 -https://doi-org.hr.idm.oclc.org/10.1145/2898375.2898390
+
+=== Slide 3 ===
+Data Lifecycle in (web) applications
+(1)
+Data has three known states :
+§
+Data in transit -> session data in the network
+§
+Data at rest - > data in a database
+§
+Data in use -> profile data of a user in a
+mobile device
+How to address security concerns in the data
+lifecycle?
+1 -https://ieeexplore.ieee.org/document/5676895
+
+=== Slide 4 ===
+Secure Software Development Lifecycle (S-SDLC) 4
+Before:
+ManySDLCexistssuchas:Waterfall,Agile,V-model,etc.
+§
+Securityisnotconsideredinanyofthephasesofthesoftwaredevelopmentlifecycle
+§
+Atbestsomesecurityactivitiesarementioned
+§
+Optionalinnon-functionalrequirements
+§
+There is no concrete definition of security activities, techniques, and methods that can be applied in software
+developmentprojects(1)
+Then:
+§
+ManymodelsforS-SDLCareavailable:
+§ Thetrustworthycomputingsecuritydevelopmentlifecycle(MicrosoftSDL)(2)
+§ ComprehensiveLightweightApplicationSecurityProcess(CLASP)(3)
+§ SoftwareAssuranceMaturityModel(OPENSAMM)(4)
+§
+Etc.
+1-http://dx.doi.org/10.3390/electronics8111218
+2-https://www.microsoft.com/en-us/securityengineering/sdl/
+3-https://owasp.org/www-pdf-archive/Us_owasp-clasp-v12-for-print-lulu.pdf
+4-https://www.opensamm.org
+
+=== Slide 5 ===
+Secure Software Development Lifecycle (S-SDLC) 5
+Commonsecurityactivities(deVicenteMohinoetal.,2019)
+§
+Vulnerabilityanalysis
+§
+requirementsidentification,analysis,design,andimplementation
+§
+Threatmodeling
+§
+requirementsidentification,analysis,design,andimplementation
+§
+Penetrationtesting
+§
+development,testing,andvalidationphases
+§
+Codeanalysis
+§
+duringdevelopmentandbeforedeployment.
+§
+White/black/graytesting
+§
+testingandvalidationphase
+Waterfall SDLC and possible
+security activities as proposed
+by (Mcgraw, 2004)(1)
+1 -https://doi.org/10.1109/msecp.2004.1281254
+
+=== Slide 6 ===
+Threats, Vulnerabilities, and Risk 6
+From the National Institute of Standards and Technology (NIST) glossary:
+Vulnerabilities: “a flaw or weakness in system security procedures, design, implementation, or internal controls that
+could be exercised and result in a security breach or a violation of the system's security policy”
+§
+Software -> insecure coding
+§
+Hardware -> overheating
+Threat: “Any circumstance or event with the potential to adversely impact an information system through
+unauthorized access, destruction, disclosure, modification of data, and/or denial of service”
+§
+Accidental -> equipment failure or environmental disruptions
+§
+Deliberate -> purposeful attacks or spying
+Risk: “a measure of the extent to which an entity is threatened by a potential circumstance or event,”
+
+=== Slide 7 ===
+HTTP
+(Hypertext Transfer Protocol)
+
+=== Slide 8 ===
+C -S M WEB 8
+LIENT ERVER ODEL OF
+TCP connection is established, the
+browser sends a HTTP request
+asking the web server to provide the
+wanted document.
+The web server sends a reply
+containing the page contents, and
+closes the connection.
+The browser is always the initiating party—the server never ‘‘calls back’’.
+This means that HTTP is a client/server protocol.
+The client will typically be a web browser, but it need not be. It may be any
+program capable of sending HTTP requests to a web server.
+
+=== Slide 9 ===
+HTTP 9
+VERSIONS
+Which versions are supported by default?
+Currently, the majority of web servers and browsers support versions 1.1, 2 and 3
+Main differences
+§
+Version 1.0 -> Methods: GET, POST, and HEAD
+§
+Version 1.1 ->
+§
+New methods: added six extra methods, for example: PUT and
+DELETE
+§
+Persistent connections: it is possible to execute several requests using a
+single connection
+
+=== Slide 10 ===
+H V 2 10
+TTP ERSION
+§
+Version 2 -> improved the performance of the protocol
+§
+Request multiplexing: allows sending requests and receiving responses
+asynchronously. It is possible to send multiple requests at the same
+time using a single connection
+§
+Server push: the server tries to predict the resources that will be
+requested and proactively pushes these resources to the client cache
+Try it: https://http2.akamai.com/demo
+
+=== Slide 11 ===
+H V 3 11
+TTP ERSION
+§
+Version 3 -> based on Quick UDP Internet Connections(QUIC)
+§
+Different network layer structure (TCP is replaced)
+§
+Native and standard encryption (there are no more HTTP and HTTPS,
+every HTTP communication is encrypted)
+
+=== Slide 12 ===
+R R 12
+EQUESTS AND ESPONSES
+HTTP is line oriented, just like many other Internet protocols.
+Communication takes place using strings of characters,
+separated by carriage return (ASCII 13) and line feed (ASCII 10).
+http://www.someplace.example
+Example:
+Request
+
+=== Slide 13 ===
+G R 13
+ET EQUEST
+POST, HEAD, …
+Request-URI
+HTTP-Version identifier
+Method token
+Request-line
+Request-header lines
+
+=== Slide 14 ===
+R 14
+ESPONSE
+“404 Not Found”
+Status-Code
+HTTP-Version
+the Status-Line
+Bytes
+Request-header lines
+
+=== Slide 15 ===
+G R . P R 15
+ET EQUEST VS OST EQUEST
+POST requests should be used when the action about to be taken has side
+effects on the server, i.e. when something is permanently changed.
+§
+With GET, a client asks for information.
+§
+With POST, the client contributes information.
+§
+With GET requests, the browser is free to resend the request, for example,
+when the user presses the ‘‘back button’’ in his browser (not suitable for
+money transfers in a bank).
+§
+POST requests, on the other hand, cannot be reissued by the browser
+without first asking the user for permission to do so.
+§
+In a GET request, any parameters are encoded as part of the URL.
+§
+In a POST request, the parameters are ‘‘hidden’’.
+
+=== Slide 16 ===
+P 16
+OST REQUEST EXAMPLE
+The parameters are encoded as you are used to, but they are hidden in the
+request rather than being part of the URL.
+§
+URL Encoding refers to the escaping of certain characters by encoding
+AT&T AT%26T
+them using a percent sign followed by two hexadecimal digits.
+
+=== Slide 17 ===
+S C 17
+ECURITY ONCERN
+What can be the security concern?
+As all requests originate on the client-side, that is, on computers of which the
+user has full control, nothing stops the attacker from replacing the browser
+with something completely different.
+As HTTP borrows its line oriented nature from
+the telnet protocol, you may actually use the
+telnet program to connect to a web server.
+Everybody can write a program to connect a socket and do the actual
+protocol conversation for him/her.
+
+=== Slide 18 ===
+Proxy 18
+There are freely available programs
+that will aid them in manipulating all
+data that get sent to the server.
+Some of these programs are proxies
+that sit between your browser and
+any web server, and that pop up nice
+dialogs whenever your browser sends
+anything.
+The proxies let you change headers
+and data before they are passed to
+the server.
+
+=== Slide 19 ===
+T R 19
+HE EFERER HEADER
+A Referer header is sent by most browsers on most requests.
+§
+The header contains the URL of the document from which the request
+originated.
+http://www.site.example/index.html
+Example:
+www.images.example
+The HTML snippet includes an image from and links to
+www.news.example
+a page on .
+
+=== Slide 20 ===
+What is the security concern with referer header? 20
+When the browser views the HTML, it will immediately connect to
+www.images.example
+to obtain the image.
+§
+When requesting the image, the browser sends a Referer header like this:
+The URL points to the page from which the image was referred.
+Any Java Applets, ActiveX, scripts and plug-ins included in the page would give
+the same Referer header.
+And not only included objects: if the user clicks the link given above,
+www.news.example
+will receive the same Referer header.
+
+=== Slide 21 ===
+Risks? 21
+Let’s see it online: https://www.hogeschoolrotterdam.nl/
+1. It leaks information to remote sites.
+Any part of the URL, including parameters, will be visible to the third-party
+web server and any proxies that handle the request.
+2. The Referer header originates on the client.
+Some web sites check this header to make sure the request originated from
+a page generated by them (e.g. to prevent attackers from saving web
+pages, modifying forms, and posting them off their own computer).
+§
+This security mechanism will fail, as the attacker will be able to modify
+the Referer header to look like it came from the original site.
+
+=== Slide 22 ===
+C 22
+ACHING
+Caching refers to temporarily storing documents close to the final destination,
+in order to reduce download times.
+Two types of web caches:
+§
+Local
+Local cache: is managed by the browser itself.
+Cache
+When the browser requests a document from
+Shared
+Cache
+a remote server, it often stores a copy on the
+disk or in memory.
+§
+Shared (proxy) cache: is typically a server in the local area network.
+If one user reads an on-line newspaper, and another user reads the same
+paper shortly after, the proxy cache may serve a local copy of the
+document to the second user.
+
+=== Slide 23 ===
+Security Concern 23
+Some documents should not be cached. For example:
+§
+Visitors a stock information web site most likely want up to date stock
+information, not yesterday’s news.
+§
+People might be able to use the back button to see other people’s web
+pages in a shared browser, such as in Banks, Internet cafés.
+Such sites need a way to tell browsers and proxies that documents should not
+be cached, or that they may only be cached for a limited time.
+As with most other control information on the web, cache control is handled by
+HTTP headers.
+Different versions of HTTP specify different mechanisms for cache control.
+
+=== Slide 24 ===
+C 24
+OOKIES
+HTTP is a stateless protocol (no ties connecting different requests from the
+same client).
+§
+We would like to have state between requests. What state for example?
+Google search engine once used cookies to allow users (even non-
+registered ones) to decide how many search results per page they wanted to
+see.
+§
+Cookies are introduced as an extension to HTTP to give us just the state.
+With cookies, the web server asks the client to remember a small piece of
+information.
+This information is passed back by the client on each subsequent request to
+the same server.
+
+=== Slide 25 ===
+C 25
+OOKIES
+HTTP headers are used for both setting and returning cookies.
+When server wants the client to remember a cookie, it passes a Set-Cookie
+header in the reply:
+To which parts of the document
+Name of cookie How many seconds to
+hierarchy on this server
+and its value remember it
+that cookie should be returned
+Cookies are returned using the Cookie header:
+
+=== Slide 26 ===
+C 26
+OOKIES
+Drawbacks:
+§
+Firstly, cookies may be limited in size, so space consuming states cannot be
+safely represented using cookies.
+§
+Secondly, cookies are handled on the client-side, so we have to keep
+making sure that a misbehaving user doesn’t change the state to his own
+liking.
+Both limitations would be solved if we could keep the state information on the
+server side.
+
+=== Slide 27 ===
+Sessions
+27
+
+=== Slide 28 ===
+S (S O ) 28
+ESSIONS ESSION BJECTS
+Sessions are server-side collections of variables that make up the state.
+How to associate a set of data on the server to the correct client?
+Answer: Session ID
+§
+The common approach is to have the client pass a session ID on each
+request.
+The session ID uniquely identifies
+one session object on the server,
+the session object ‘‘owned’’ by the
+client making the request.
+Security problem with sessions?
+
+=== Slide 29 ===
+S 29
+ESSION HIJACKING
+Many web sites use a session-based log-in, in which a session is initiated once
+the user has given a valid user name and password.
+If somebody gets access to the session ID of a logged in user?
+The attacker would not need to know the password of the victim, as the session
+ID works as a ‘‘short-time password’’ or a proof of successful authentication
+after a user has logged in.
+
+=== Slide 30 ===
+S 30
+ESSION HIJACKING
+How would the attacker gain access to the session ID?
+§
+Guess it,
+§
+Calculate it,
+§
+Brute-force it,
+§
+Find it by trial and error
+§
+Cross-site Scripting
+§
+Use referer header
+§
+Packet sniffing
+§
+…
+
+=== Slide 31 ===
+Countermeasure 31
+The security of sessions lay in the secrecy of the session ID.
+The number one goal to prevent session hijacking is to keep the session ID
+unavailable to third parties.
+As an extra precaution, many web sites implement secondary measures to limit
+the risk of session hijacking, even if a session ID becomes available to
+attackers.
+However, none of these secondary mechanisms offer full protection against
+hijacking.
+The secrecy of the session ID is the only mechanism that gives real protection.
+
+=== Slide 32 ===
+secondary measures 32
+1. Tie the session ID to the IP address of the client.
+It will not protect against attackers who hide behind the same web proxy as
+the victim, as all requests from the same proxy will come from the same IP
+address.
+2. Tie the session ID to certain HTTP headers passed by the client, such as
+the User-Agent header.
+This approach isn’t bulletproof either: an attacker could mimic the headers
+sent by several popular browsers. One of the combinations would probably
+let him through.
+
+=== Slide 33 ===
+33
+3. Have variable session IDs, a scheme in which the session ID is changed for
+every request.
+Unfortunately, this wouldn’t give full protection either. An attacker that got
+access to a session ID could quickly present it to the web site before the
+victim do a new request.
+The attacker would thus completely take over the session, blocking the
+victim from further access.
+The number one measure against session hijacking is to make
+sure session IDs won’t be leaked to third parties in the first
+place.
+Without a valid session ID, session hijacking is very hard.
+
+=== Slide 34 ===
+HTTPS
+34
+
+=== Slide 35 ===
+HTTP : E C 35
+S NCRYPTED OMMUNICATION
+To make a web server secure, encryption plays an
+important role.
+In a web setting, encryption usually means HTTPS.
+§
+HTTPS may be described as HTTP communicated over an encrypted
+channel.
+§
+The encrypted channel can be
+provided by the following protocols:
+§
+Secure Socket Layer (SSL)
+§
+Transport Layer Security (TLS)
+
+=== Slide 36 ===
+36
+Encryption only protects the
+network connection between
+the client and the server.
+An attacker may still attack both
+the server and the client, but he
+will have a hard time attacking the
+communication channel between them.
+
+=== Slide 37 ===
+P S 37
+ACKET NIFFING
+Packet sniffing attacks the network transport rather than
+the application or the client.
+The correct approach to protect against sniffing is to
+encrypt all communication.
+
+=== Slide 38 ===
+D P S HTTPS 38
+EFEAT ACKET NIFFING USING
+HTTPS makes it impossible for
+someone to listen to traffic in order
+to extract secrets.
+People may still sniff packets, but
+the packets contain seemingly
+random data.
+
+=== Slide 39 ===
+M M (MITM) 39
+AN IN THE IDDLE
+In MITM, the attacker fools
+the victim’s computer into
+connecting to him rather than
+the real server (e.g. a bank).
+The attacker then connects to the target server on behalf of the victim, and
+effectively sits between the communicating parties, passing messages back and
+forth.
+§
+He may thus both listen to and modify the communication.
+
+=== Slide 40 ===
+40
+When HTTPS is used, the clients will always verify the server’s certificate.
+Due to the way certificates are generated, the man in the middle will not be able
+to create a fake, but valid certificate for the web site.
+Note that HTTPS in real life
+doesn’t always solve the problems
+completely:
+§
+Ignorant user
+§
+Fake website with similar domain name
+§
+Certification authorities’ mistakes
+§
+Bugs in browsers
+§
+….
+
+=== Slide 41 ===
+C M A 41
+ERTIFICATE BASED UTUAL UTHENTICATION
+When HTTPS is used,
+the clients will always
+verify the server’s
+certificate.
+
+=== Slide 42 ===
+D MITM HTTPS 42
+EFEAT USING
+HTTPS provides good protection of the communication channel, unless:
+§
+The user neglects the warnings from the browser.
+§
+The browser allows the user to neglect its warnings.
+§
+The user falls for cheap domain name or protocol tricks played by an
+attacker.
+§
+The CA may be tricked into giving out false certificates.
+§
+The browser vendor trusts a CA that the user wouldn’t trust.
+§
+The browser (or server) has a buggy SSL/TLS implementation.
+§
+The user’s computer is controlled by an attacker.
+HTTPS is not a magic bullet, however it is a good widely available mechanism for
+securing web traffic.
+
+=== Slide 43 ===
+Summary
+43
+
+=== Slide 44 ===
+S 44
+UMMARY
+§
+HTTP is a simple, text-oriented protocol.
+§
+Clients connect to servers and send requests, each of which draws a
+response from the server.
+§
+Headers are used to control the communication, and to pass cookies.
+§
+All request headers and data are controlled by the client.
+§
+An attacker may thus easily pass headers and data after his own liking.
+
+=== Slide 45 ===
+S 45
+UMMARY
+§
+Sessions are server-side containers for state information.
+§
+Attackers may be able to hijack the sessions of other users by getting hold
+of their session ID.
+§
+Several measures are available to make session hijacking hard, but the real
+solution is to keep the session ID a secret.
+§
+HTTPS protects data that pass between the client and the server.
+§
+Unfortunately, real world implementations of HTTPS are not bulletproof.
+Many weak links play a part in the game, and some of those links may easily
+break.
+
+=== Slide 46 ===
+46

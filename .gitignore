@@ -1,0 +1,24 @@
+# --- Python build-/cache-artefacten ---
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# --- Virtuele omgevingen ---
+.venv/
+venv/
+env/
+
+# --- Door de applicatie gegenereerde data (nooit in versiebeheer) ---
+# De SQLite-database bevat (versleutelde) persoonsgegevens en wordt bij het
+# starten automatisch aangemaakt; backups worden lokaal gegenereerd.
+declaratie.db
+*.db
+backups/
+
+# --- Editor / OS ---
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db

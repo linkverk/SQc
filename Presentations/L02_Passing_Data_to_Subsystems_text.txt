@@ -1,0 +1,469 @@
+=== Slide 1 ===
+Software Quality
+Lesson 2:
+Passing Data to Subsystems
+
+=== Slide 2 ===
+I 2
+NTRODUCTION
+Most dynamic web applications pass data to one or more subsystems:
+§
+SQL databases,
+§
+Operating systems,
+Web Application
+§
+Libraries,
+§ Database Server
+Shell command interpreters,
+§
+XPath handlers, Internet
+Web Server
+§
+XML documents,
+§
+Legacy systems,
+§
+Users’ browsers
+We communicate with these subsystems by building strings that contain some
+control information, and some data.
+
+=== Slide 3 ===
+W D ? 3
+HAT ATA
+In such cases, the subsystems contain a parser which decodes incoming strings
+character by character, and decides what to do based on what it reads.
+To our application, the data parts of what we send are just strings; sequences
+of characters.
+The characters strings may represent names, addresses, passwords, entire web
+pages, and just about everything.
+Web Application
+Database Server
+Internet
+Web Server
+strings ?
+
+=== Slide 4 ===
+M 4
+ETACHARACTERS
+When our application passes data around, the strings may reach a system in
+which one or more of the characters are not treated as plain text, but as
+something special.
+When passing the border between our application and that subsystem, the
+character changes from being an information-carrying piece of a text to
+becoming a control character.
+It has become a metacharacter, as it Web Application
+rises above the pure data.
+Database Server
+Internet
+Web Server
+strings control
+
+=== Slide 5 ===
+W R ? 5
+HAT IS THE ISK
+§
+Metacharacters are needed for many things, and they do not pose a threat by themselves.
+§
+The problems is raised when developers think they are passing pure data, and those ‘‘data’’
+are found to contain characters that make the subsystem do something else than we expect.
+§
+When the subsystem parser reaches a metacharacter, it stops reading pure data, and may
+instead start reading commands: The parser switches context.
+§
+If an attacker is able to force such a context switch, we may be in deep trouble. How?
+§
+The attacker may be able to control what the subsystem does, by passing control information
+to the subsystem.
+
+=== Slide 6 ===
+SQL Injection
+
+=== Slide 7 ===
+W SQL I ? 7
+HAT IS NJECTION
+In SQL Injection, an attacker is able to modify or add queries that are sent to a
+database by playing with input to the web application.
+The attack works when a program builds queries based on strings from the
+client, and passes them to the database server without handling characters that
+have special meaning to the server.
+Web Application
+Web Server
+Database Server
+Internet
+SQL Query
+SQL Injection
+
+=== Slide 8 ===
+E 1 8
+XAMPLE
+In a SQL-based user database, a user registers his real name.
+The Java code that picks up his real name from the registration form and stores
+it in the database looks like this:
+Two new users:
+What is the issue?
+
+=== Slide 9 ===
+The issue? 9
+Suppose we would like to make a web application that requires users to log-in
+through a form:
+How a hacker attacks it?
+As our program just inserts the input unmodified in the query, what eventually is
+sent to the database looks like this:
+SQL Comment
+
+=== Slide 10 ===
+10
+SQL Comment
+The two hyphens (--) make up an SQL comment introducer.
+§
+It effectively inactivates the test for a matching password!
+Any suggestion to prevent it?
+Does it solve the issue if we filter out that double hyphen?
+§
+No. The hyphens are not part of the problem at all.
+
+=== Slide 11 ===
+Example 2 11
+Let’s try it without double hyphen in MS Access:
+The ASP/VBScript equivalent of the above Java code:
+The attacker knows that regular comments won’t help him, so he turns to
+playing with Boolean operator precedence rules.
+
+=== Slide 12 ===
+12
+He enters the below as user name this time, still leaving the password empty:
+Our application puts it all together, and passes this query to MS Access:
+And once again he gains access to John’s stuff, this time without using the SQL
+comment introducer. Why?
+
+=== Slide 13 ===
+13
+The Boolean operators AND and OR are influenced by certain priority rules.
+The rules state that AND takes precedence over OR, meaning that the AND
+part will be executed before the OR part.
+FALSE
+FALSE
+TRUE
+
+=== Slide 14 ===
+So, what was the problem? 14
+The hyphens were not the problem.
+The security hole occurred because the attacker was able to enter a single
+quote, and It is all about contexts and parsing.
+When the SQL parser (or interpreter) of the database has just read:
+all characters up to and including the first single quote, it switches to parsing a
+string constant.
+The real problem: The attacker is allowed to make the SQL parser switch
+context.
+
+=== Slide 15 ===
+P SQL I 15
+REVENTING NJECTION
+The solution involves metacharacters.
+We should make them lose their special meaning, Either by handling them
+manually, or preferably by building queries in a way in which there are no
+metacharacters.
+1. Neutralizing SQL metacharacters
+2. Using prepared statements
+
+=== Slide 16 ===
+N SQL 16
+EUTRALIZING METACHARACTERS
+Whenever we build an SQL query string that we intend to pass to a database
+server, we must make sure no metacharacters slip through unhandled.
+First, carefully read the database server documentation to see what characters
+need special treatment. Why?
+Any database server based on SQL will need to have quotes escaped in
+string constants.
+According to the SQL specification by ANSI, single quotes in string
+constants can be escaped by duplicating them.
+Is it enough?
+
+=== Slide 17 ===
+17
+Some databases add their own non-standard metacharacters.
+For example, In the open source PostgreSQL database and MySQL, string
+constants may contain backslash escape sequences just like in C and Java.
+That backslash may even be used for escaping the quote.
+§
+Do we need to take care of such other metacharacters?
+
+=== Slide 18 ===
+Example 18
+Suppose we have a system written in ASP/VBScript, and talks to a PostgreSQL
+database server.
+It accepts a user name from a form, and looks up the matching user in the database.
+1
+2
+3
+1. First, the user name is read from the POSTed data.
+userNameSQL
+2. Then every quote character is escaped by doubling, and the resulting
+is encapsulated in quotes to make it an SQL string constant.
+3. Finally, the constant is included in the query.
+
+=== Slide 19 ===
+can it be attacked? 19
+Input: ’john’’--’
+A clever attacker fills in the user name entry:
+The web application did not do anything to the backslash, it just doubled the
+only single quote present in the input.
+\’
+The database in use will think that is to be taken as a single quote character.
+It terminates the string constant prematurely, opening the vulnerability again.
+all users are deleted.
+
+=== Slide 20 ===
+Sample Solution 20
+A sample string washer for PHP programs talk to PostgreSQL:
+An equivalent function suitable for ASP with MS SQL Server:
+
+=== Slide 21 ===
+U 21
+SING PREPARED STATEMENTS
+Instead of handling the escaping of SQL metacharacters ourselves, we could
+use prepared statements.
+In this method, query parameters are passed separately from the SQL
+statement itself. When using prepared statements, there are no metacharacters.
+An example in Java:
+
+=== Slide 22 ===
+Benefits 22
+Using prepared statements is not particularly more cumbersome than using
+those application-built string queries.
+1. We don’t need to remember all that metacharacter handling.
+2. Prepared statements generally execute faster than plain statements, as
+they get parsed only once by the database server.
+
+=== Slide 23 ===
+In-class Activity
+23
+
+=== Slide 24 ===
+Shell Command Injection
+24
+
+=== Slide 25 ===
+W S I ? 25
+HAT IS HELL NJECTION
+Programs written in web programming languages,
+such as Perl and similar languages often rely
+heavily on running external commands to perform
+many tasks.
+When a Perl program runs an external command,
+the interpreter will in many cases leave the actual
+running of the program to an operating system
+sh bash csh tcsh
+shell, such as , , or .
+Unfortunately, shells typically understand a large set of metacharacters, and
+one risks major security problems if one doesn’t do any filtering.
+
+=== Slide 26 ===
+E 1: C S 26
+XAMPLES OMMAND UBSTITUTION
+Suppose we would like to build a dynamic web application in Perl that would
+allow users to see if somebody is logged in to one of the Unix machines at the
+university.
+finger
+In Unix, there’s a program called that will give the necessary
+information:
+ask the shell to run the command between the
+backticks, and then replace the entire backtick thing
+with the output from that command.
+
+=== Slide 27 ===
+27
+What would happen if somebody asked the program to look up a user with this
+strange looking username?
+Given that input, the program would instruct the shell to execute the following
+semicolon-separated sequence of commands:
+Guess what would be the result?
+The system would first run a finger command on a nonexistent user,
+followed by an ugly looking command that would actually try to
+delete every file recursively.
+
+=== Slide 28 ===
+E 2: P C 28
+XAMPLE IPING THE OMMANDS
+In Unix, there has traditionally been a file called
+/etc/passwd
+that contains information of all users,
+including hashed representations of their passwords.
+§
+Imagine a Perl-based CGI script that for some
+reason sends someone an E-mail.
+The E-mail is sent by piping the contents of the mail
+sendmail
+through the program.
+It needs the recipient address on the command line.
+
+=== Slide 29 ===
+29
+The password-stealing intruder registers with the following ‘‘E-mail address’’:
+When included in the sendmail invocation in the open statement above, the
+commands executed by the shell will be:
+2
+1
+3 Result?
+(1) First that call to sendmail.
+(2) Then a semicolon which again functions as a command separator, and
+mail
+(3) Finally a call to another common Unix mailer, ,
+/etc/passwd
+that actually passes the entire to the attacker.
+
+=== Slide 30 ===
+A S C I 30
+VOIDING HELL OMMAND NJECTION
+1. Identify when the shell is being used.
+2. Handling and Disarming the shell metacharacters.
+3. Avoiding user input in the command arguments.
+4. Managing without the shell.
+
+=== Slide 31 ===
+1. Invocation of the Shell 31
+§
+Identify the functions in your programming language that pass data to a
+command shell, or the ways to invoke a shell.
+for example:
+§
+system popen
+C or C++: and
+§
+exec passthru
+Perl: the backtick operator, and the functions , ,
+proc_open shell_exec system
+, popen, and .
+§
+In our example:
+
+=== Slide 32 ===
+2. Handling the shell metacharacters 32
+Different shells have different metacharacters, and the use of the
+metacharacters differs too.
+§
+Metacharacters in Bash (GNU Bourne-Again SHell):
+§
+Example:
+
+=== Slide 33 ===
+Solution 1: single quote encapsulation 33
+The single quote encapsulation is the strictest way to make the shell treat a text
+as just plain text.
+§
+The single quotes are thus good for encapsulating data that do not
+contain single quotes.
+§
+If data contain single quotes, we can still use single quote encapsulation if
+we split the string on all single quotes and glue quoted strings together
+using a backslash-escaped single quote.
+
+=== Slide 34 ===
+Solution 2: Double quote encapsulation 34
+Another approach is to encapsulate the data string in double quotes.
+§
+Inside a doubly quoted string, all characters except the following
+characters lose their special meaning:
+$
+` (backtick)
+"
+\
+§
+Occurrences of these four special characters must be escaped using a
+backslash.
+
+=== Slide 35 ===
+Solution 3: escape every metacharacter 35
+A third approach is to escape every metacharacter in the data string by
+prefixing them with a backslash.
+§
+escapeshellcmd
+The PHP function does this.
+It involves what is known as blacklisting.
+§
+We handle the characters we know are unsafe, and let the rest pass
+unchanged.
+§
+There are many metacharacters, and we may easily miss some of them.
+Escaping shell metacharacters is hard, particularly if we are not quite sure what
+kind of shell will be used.
+
+=== Slide 36 ===
+3. Avoiding user input in the command arguments 36
+If we can avoid passing user data on the command line, it becomes simpler.
+§
+In such cases neither the shell nor the target program may be tricked into
+doing nasty stuff by command line arguments.
+Some programs may be forced to read data from files or from the input stream
+rather than from the command line.
+The code is vulnerable to attack because it put the user provided recipient
+address on the command line.
+
+=== Slide 37 ===
+Any Solution? 37
+-t sendmail
+By using the option, may actually be told to take the recipient
+address from the mail headers.
+Note that if the target program somehow parses the incoming data, it
+may still be possible to make it misbehave.
+Although this code is not vulnerable to shell command injection, still
+makes it possible for an attacker to use the web application for sending
+anonymous E-mails.
+
+=== Slide 38 ===
+4. No Shell 38
+Why should we use the shell at all?
+After all, the shell doesn’t provide anything that we can’t program ourselves.
+In many cases we use the shell just to launch an external program.
+§
+If we do not need any of the features provided by the shell, we might just as
+well start the program directly.
+Often, we do not even need to run an external program
+in order to do the job.
+§
+For example: for sending E-mails.
+A person familiar with SMTP (Simple Mail Transfer Protocol) and network
+programming would be able to write Perl code to do the same in less than 100 lines.
+
+=== Slide 39 ===
+Summary
+39
+
+=== Slide 40 ===
+S 40
+UMMARY
+§
+A web application will typically pass data to many types of subsystems:
+databases, command shells, XML documents, file systems, libraries, legacy
+systems, and so on.
+§
+Many of these systems treat certain characters in a special way.
+§
+These metacharacters must be escaped to be treated as plain characters.
+§
+If they are not escaped, attackers may be able to inject control information
+to dictate the behavior of the subsystem.
+§
+Metacharacters typically make a problem where data are mixed with
+nondata.
+
+=== Slide 41 ===
+Summary 41
+§
+Some subsystems provide alternate means of transferring data.
+§
+When possible, we should use these mechanisms to pass data separately
+from control information.
+§
+As it is often hard to identify all possible metacharacters, we should strive
+for defense in depth.
+§
+There should be other mechanisms that minimize the risk for damage if the
+metacharacter handling fails.
+§
+Such mechanisms include input validation and carefully tuned permission
+settings.
+
+=== Slide 42 ===
+42
